@@ -1,0 +1,1 @@
+{"CompletedCredits": 10, "Surname": "Adam", "Name": "Johns", "AdvisorID": 150118000, "StudentID": 150118000, "Transcript": [{"Course1": 4}, {"Course1": 4}, {"Course1": 4}, {"Course1": 4}, {"Course1": 4}, {"Course1": 4}, {"Course1": 4}, {"Course1": 4}, {"Course1": 4}, {"Course1": 4}]}
