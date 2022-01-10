@@ -7,6 +7,24 @@ from StudentID import StudentID
 from Transcript import Transcript
 
 
+class SystemTests:
+
+    @staticmethod
+    def test_course_prerequisites():
+        test_courses = StudentAffairs.read_json(JsonSettings(JsonType.COURSE, None))
+        for course in test_courses:
+            print(course.courseName + " " + course.courseCode + " " + (course.semester if int(course.semester) <= 8 else "Elective"))
+            for course_preq in course.prerequisites:
+                print("##Preq##" + course_preq.courseName)
+
+    @staticmethod
+    def test_random_student_creation():
+        student_affairs = StudentAffairs()
+        random_students = student_affairs.create_random_student_list(100, 2018)
+        for student in random_students:
+            print(student.firstName + " " + student.lastName + " " + student.studentID.fullID + " " + "Completed Credits: " + student.completedCredits)
+
+
 class JsonType(Enum):
     STUDENT = 1
     COURSE = 2
@@ -107,11 +125,7 @@ class StudentAffairs:
 
         return StudentAffairs.get_obj(json_settings.json_type, data)
 
+
 # StudentAffairs.save_json(x["Name"], x["Surname"])
 
-test_courses = StudentAffairs.read_json(JsonSettings(JsonType.COURSE, None))
-student_affairs = StudentAffairs()
-random_students = student_affairs.create_random_student_list(100, 2018)
-for student in random_students:
-    StudentAffairs.write_json(JsonSettings(JsonType.STUDENT, student.studentID.fullID), student)
-print(len(random_students))
+SystemTests.test_course_prerequisites()
