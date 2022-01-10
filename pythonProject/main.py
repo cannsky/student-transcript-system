@@ -17,7 +17,7 @@ class JsonSettings:
     def __init__(self, json_type, s_id):
         self.json_type = json_type
         if self.json_type == JsonType.STUDENT:
-            self.file_string = "students/" + s_id
+            self.file_string = "students/" + s_id + ".json"
         else:
             self.file_string = "courses.json"
 
@@ -36,7 +36,7 @@ class StudentAffairs:
             student_id = StudentID(year - int(0), i + 1)
             student = Student(random.choice(self.firstNameList).strip('\n'), random.choice(self.lastNameList).strip('\n'),
                               student_id,
-                              Transcript([], []), "advisor", "semester", "schedule", 0)
+                              Transcript([],[], 0), "advisor", "semester", "schedule", 0)
             students.append(student)
         return students
 
@@ -89,13 +89,14 @@ class StudentAffairs:
                            5,
                            None,
                            None))
+                prerequisites = []
         return obj
 
     @staticmethod
     def write_json(json_settings, obj):
         temp_dict = StudentAffairs.get_dict(json_settings.json_type, obj)
 
-        with open(json_settings.file_string, "w") as output_file:
+        with open(json_settings.file_string, "x") as output_file:
             json.dump(temp_dict, output_file)
 
     @staticmethod
@@ -109,4 +110,8 @@ class StudentAffairs:
 # StudentAffairs.save_json(x["Name"], x["Surname"])
 
 test_courses = StudentAffairs.read_json(JsonSettings(JsonType.COURSE, None))
-print(len(test_courses))
+student_affairs = StudentAffairs()
+random_students = student_affairs.create_random_student_list(100, 2018)
+for student in random_students:
+    StudentAffairs.write_json(JsonSettings(JsonType.STUDENT, student.studentID.fullID), student)
+print(len(random_students))

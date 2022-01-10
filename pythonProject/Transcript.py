@@ -12,7 +12,8 @@ class Transcript:
     gpa = None
     cgpa = None
 
-    def __init__(self, transcriptJsonList, transCriptJsonStudentInfo):
+    def __init__(self, transcriptJsonList, transCriptJsonStudentInfo, type):
+        if(type == 0): return
         self.transcriptJsonList = transcriptJsonList
         self.fillLists(self.courseList, self.numberGradeList, self.letterGradeList, self.transcriptJsonList)
 
