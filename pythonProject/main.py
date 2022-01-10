@@ -96,7 +96,7 @@ class StudentAffairs:
     def write_json(json_settings, obj):
         temp_dict = StudentAffairs.get_dict(json_settings.json_type, obj)
 
-        with open(json_settings.file_string, "x") as output_file:
+        with open(json_settings.file_string, "w+") as output_file:
             json.dump(temp_dict, output_file)
 
     @staticmethod
