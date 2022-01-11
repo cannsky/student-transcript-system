@@ -12,7 +12,7 @@ class StudentID:
             self.fullID = str(self.deptCode + str(self.entryYear % 100) + str("%.3f" % (self.rank / 1000))[2:])
 
         else:
-            fullID = args[0]
-            self.deptCode = fullID[:4]
-            self.entryYear = int(fullID[4:6]) + 2000
-            self.rank = int(fullID[6:])
+            self.fullID = args[0]
+            self.deptCode = args[0][:4]
+            self.entryYear = int(args[0][4:6]) + 2000
+            self.rank = int(args[0][6:])
