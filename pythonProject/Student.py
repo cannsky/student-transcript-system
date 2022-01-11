@@ -1,7 +1,7 @@
 class Student:
     def __init__(self, *args):
 
-        if len(args == 8):
+        if len(args) == 6:
             self.firstName = args[0]
             self.lastName = args[1]
             self.studentID = args[2]
