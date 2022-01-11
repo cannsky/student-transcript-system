@@ -50,6 +50,29 @@ class StudentAffairs:
         self.lastNameList = file1.readlines()
         self.courses = StudentAffairs.read_json(JsonSettings(JsonType.COURSE, None))
 
+    def write_lecture_hours(self):
+
+        with open("lecturehours.json") as input_file:
+            data = json.load(input_file)
+
+        return data
+
+    def write_lecture_hours(self):
+
+        courseHourJsonObj = []
+        for course in self.courses:
+            courseHourJsonObj.append([course.courseCode, random.randint(1, 9)])
+
+        temp_dict = {
+            "Lecture Hours": []
+        }
+
+        for course in courseHourJsonObj:
+            temp_dict["Lecture Hours"].append(course);
+
+        with open("lecturehours.json", "w+") as output_file:
+            json.dump(temp_dict, output_file)
+
     def create_random_student_list(self, count, year):
         students = []
         for i in range(count):
@@ -89,6 +112,16 @@ class StudentAffairs:
                             obj.transcript.transcriptList[i][1][k][1],
                             obj.transcript.transcriptList[i][1][k][2],
                         ])
+        else:
+            obj_dict = {
+                "Name": obj.firstName,
+                "Surname": obj.lastName,
+                "StudentID": obj.studentID.fullID,
+                "Semester": obj.semester,
+                "AdvisorID": 150118000,
+                "Completed Credits": obj.completedCredits,
+                "Transcript": []
+            }
         return obj_dict
 
     @staticmethod
