@@ -2,7 +2,7 @@ import json
 import random
 import re
 from enum import Enum
-from Course import Course, CourseCode
+from Course import Course, CourseCode, Semester
 from Student import Student
 from StudentID import StudentID
 from Transcript import Transcript
@@ -46,25 +46,56 @@ class JsonSettings:
 class StudentAffairs:
 
     def __init__(self):
+        self.semesters = []
+        for i in range(0, 8): self.semesters.append(Semester())
         file1 = open('firstname.txt', 'r', encoding='UTF-8')
         self.firstNameList = file1.readlines()
         file1 = open('lastname.txt', 'r', encoding='UTF-8')
         self.lastNameList = file1.readlines()
         self.courses = StudentAffairs.read_json(JsonSettings(JsonType.COURSE, None))
         self.write_lecture_hours()
+        self.read_lecture_hours()
 
-    def write_lecture_hours(self):
+    def read_lecture_hours(self):
 
         with open("lecturehours.json") as input_file:
             data = json.load(input_file)
 
+        print(data["Lecture Hours"][0])
         return data
 
     def write_lecture_hours(self):
-
         courseHourJsonObj = []
-        for course in self.courses:
-            courseHourJsonObj.append([course.courseCode.code, [random.randint(1, 5), random.randint(1, 8)]])
+
+        list = [
+            [1, 1], [1, 2], [1, 3], [1, 4], [1, 5], [1, 6], [1, 7], [1, 8],
+            [2, 1], [2, 2], [2, 3], [2, 4], [2, 5], [2, 6], [2, 7], [2, 8],
+            [3, 1], [3, 2], [3, 3], [3, 4], [3, 5], [3, 6], [3, 7], [3, 8],
+            [4, 1], [4, 2], [4, 3], [4, 4], [4, 5], [4, 6], [4, 7], [4, 8],
+            [5, 1], [5, 2], [5, 3], [5, 4], [5, 5], [5, 6], [5, 7], [5, 8]
+        ]
+        a = 1
+        while a <= 8:
+            temp = list.copy()
+            for i in self.courses:
+                if int(i.semester) == a:
+                    if i.courseType == "Mandatory":
+                        courseHourJsonObj.append([i.courseCode.code])
+                        for j in range(int(i.theoreticalHours)):
+                            choice = random.choice(temp)
+                            courseHourJsonObj[len(courseHourJsonObj) - 1].append(choice)
+                            temp.remove(choice)
+
+            temp = list.copy()
+            a += 1
+
+        while a<= 11:
+            for i in self.courses:
+                if int(i.semester) == a:
+                    courseHourJsonObj.append([i.courseCode.code])
+                    for j in range(int(i.theoreticalHours)):
+                        courseHourJsonObj[len(courseHourJsonObj) - 1].append([random.randint(1, 5), random.randint(1, 8)])
+            a += 1
 
         temp_dict = {
             "Lecture Hours": []
@@ -172,8 +203,8 @@ class StudentAffairs:
                            prerequisites,
                            100,
                            None,
-                           None))
-                data["Lecture Code"]
+                           None,
+                           data["Theoretical Lecture Hours"]))
                 prerequisites = None
         return obj
 
@@ -232,7 +263,6 @@ class StudentAffairs:
             if int(t[1]) < 30 and int(t[0]) > 1:
                 for j in failedCourseList:
                     if int(j[2]) < int(t[0]):
-                        print("...", j[0].credit[0], j[0].courseCode.code, j[2], t[0])
                         tmp = []
                         tmp.insert(0, j[0])
                         tmp.insert(1, random.choice(letterGradeList))

@@ -1,3 +1,12 @@
+class Semester:
+
+    def __init__(self):
+        self.mandatoryCourses = []
+        for i in range(0,5):
+            self.mandatoryCourses.append([None, None, None, None, None, None, None, None])
+
+
+
 
 class Schedule:
     
@@ -13,16 +22,16 @@ class Schedule:
     
 
     
-    def __init__(self, days, hours):   #Mon:1,Tue:2,Thu:3,Wed:4,Fri:5
+    def __init__(self, day, hour):   #Mon:1,Tue:2,Thu:3,Wed:4,Fri:5
         
-        self.days = days
-        self.hours = hours
+        self.day = day
+        self.hour = hour
         self.hoursCode = self.parseHours(hoursDict)
         
         
     def parseHours(self, hoursDict):
         alist = []
-        for i in self.hours:
+        for i in self.hour:
             if i in hoursDict.keys():
                 alist.append(hoursDict.get(i))
         return alist
@@ -56,7 +65,7 @@ class Course:
 
     
     def __init__(self, courseName, courseCode, courseType, semester,
-                 credit, prerequisites, quota, registeredStudents, schedule):
+                 credit, prerequisites, quota, registeredStudents, schedule, theoreticalHours):
             self.courseName = courseName
             self.courseCode = courseCode
             self.semester = semester
@@ -66,6 +75,7 @@ class Course:
             self.quota = quota
             self.schedule = schedule
             self.registeredStudents = registeredStudents
+            self.theoreticalHours = theoreticalHours
             
             
             
