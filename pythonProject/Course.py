@@ -32,21 +32,18 @@ class Schedule:
 class CourseCode:
     
     
-    def __init__(self, courseType, courseNum, section): #CSE3033
+    def __init__(self, courseType, courseNum): #CSE3033
         
         self.courseType = courseType
         self.courseNum = courseNum
-        self.section = section
         self.code = self.combineCode()
         
 
 
     
     def combineCode(self):
-        if self.section != 0:
-            return self.courseType + str(self.courseNum) + "." + str(self.section)
-        else:
-            return self.courseType + str(self.courseNum)
+        return self.courseType + str(self.courseNum)
+
         
         
         
@@ -59,7 +56,7 @@ class Course:
 
     
     def __init__(self, courseName, courseCode, courseType, semester,
-                 credit, prerequisites, quota, sections, registeredStudents, schedule):
+                 credit, prerequisites, quota, registeredStudents, schedule):
             self.courseName = courseName
             self.courseCode = courseCode
             self.semester = semester
