@@ -2,7 +2,7 @@ import json
 import random
 import re
 from enum import Enum
-from Course import Course, CourseCode
+from Course import Course, CourseCode, Semester
 from Student import Student
 from StudentID import StudentID
 from Transcript import Transcript
@@ -46,6 +46,8 @@ class JsonSettings:
 class StudentAffairs:
 
     def __init__(self):
+        self.semesters = []
+        for i in range(0, 8): self.semesters.append(Semester())
         file1 = open('firstname.txt', 'r', encoding='UTF-8')
         self.firstNameList = file1.readlines()
         file1 = open('lastname.txt', 'r', encoding='UTF-8')
@@ -61,10 +63,20 @@ class StudentAffairs:
         return data
 
     def write_lecture_hours(self):
-
         courseHourJsonObj = []
-        for course in self.courses:
-            courseHourJsonObj.append([course.courseCode.code, [random.randint(1, 5), random.randint(1, 8)]])
+        '''for course in self.courses:
+            for i in range(0, int(course.theoreticalHours)):
+                semester = int(course.semester)
+                day = random.randint(1, 5)
+                hour = random.randint(1, 8)
+                if self.semesters[semester-1].mandatoryCourses[day-1][hour-1] is None:
+                    self.semesters[semester-1].mandatoryCourses[day-1][hour-1] = course
+                    courseHourJsonObj.append([course.courseCode.code, [day, hour]])
+                for i in range(0, 5):
+                    for j in range(0, 8):
+                        if(self.semesters[semester-1]).mandatoryCourses[i][j] is None:
+                            (self.semesters[semester-1]).mandatoryCourses[i][j] = course
+                            courseHourJsonObj.append([course.courseCode.code, [i, j]]) '''
 
         temp_dict = {
             "Lecture Hours": []
@@ -172,8 +184,8 @@ class StudentAffairs:
                            prerequisites,
                            100,
                            None,
-                           None))
-                data["Lecture Code"]
+                           None,
+                           data["Theoretical Lecture Hours"]))
                 prerequisites = None
         return obj
 
