@@ -2,7 +2,7 @@ import json
 import random
 import re
 from enum import Enum
-from Course import Course, CourseCode, Semester
+from Course import Course, CourseCode, Semester, Schedule
 from Student import Student
 from StudentID import StudentID
 from Transcript import Transcript
@@ -53,15 +53,14 @@ class StudentAffairs:
         file1 = open('lastname.txt', 'r', encoding='UTF-8')
         self.lastNameList = file1.readlines()
         self.courses = StudentAffairs.read_json(JsonSettings(JsonType.COURSE, None))
-        self.write_lecture_hours()
-        self.read_lecture_hours()
+        print(self.courses[0].schedule[0].day)
 
-    def read_lecture_hours(self):
+    @staticmethod
+    def read_lecture_hours():
 
         with open("lecturehours.json") as input_file:
             data = json.load(input_file)
 
-        print(data["Lecture Hours"][0])
         return data
 
     def write_lecture_hours(self):
@@ -180,7 +179,14 @@ class StudentAffairs:
             obj = []
             prerequisites = None
             a = 0
+            lecture_hours = StudentAffairs.read_lecture_hours()
             for data in data_dict:
+                schedules = []
+                if int(data["Semester"]) <= 8:
+                    if(data["Lecture Type"] != "Elective"):
+                        for i in range(1, len(lecture_hours["Lecture Hours"][a]) - 1):
+                            schedules.append(Schedule(lecture_hours["Lecture Hours"][a][i][0], lecture_hours["Lecture Hours"][a][i][1]))
+                        a += 1
                 if data["Prerequsite"] is not None:
                     for i in range(len(obj)):
                         for j in range(len(data["Prerequsite"])):
@@ -203,7 +209,7 @@ class StudentAffairs:
                            prerequisites,
                            100,
                            None,
-                           None,
+                           schedules,
                            data["Theoretical Lecture Hours"]))
                 prerequisites = None
         return obj
