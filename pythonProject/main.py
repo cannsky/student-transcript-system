@@ -24,7 +24,7 @@ class SystemTests:
         student_affairs = StudentAffairs()
         random_students = student_affairs.create_random_student_list(100, 2018)
         for student in random_students:
-            ##print(student.firstName + " " + student.lastName + " " + student.studentID.fullID + " " + "Completed Credits: " + str(student.completedCredits))
+            print(student.firstName + " " + student.lastName + " " + student.studentID.fullID + " " + "Completed Credits: " + str(student.completedCredits))
             StudentAffairs.write_json(JsonSettings(JsonType.STUDENT, student.studentID.fullID), student)
 
 
