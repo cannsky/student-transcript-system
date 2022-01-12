@@ -4,7 +4,6 @@ class Semester:
         self.mandatoryCourses = []
         for i in range(0,5):
             self.mandatoryCourses.append([None, None, None, None, None, None, None, None])
-        print(self.mandatoryCourses)
 
 
 
