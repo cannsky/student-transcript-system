@@ -1,6 +1,8 @@
 import json
 import random
 import re
+from os import listdir
+from os.path import isfile, join
 from enum import Enum
 from Course import Course, CourseCode, Semester, Schedule
 from Student import Student
@@ -11,25 +13,25 @@ from Transcript import Transcript
 class SystemTests:
 
     @staticmethod
-    def test_course_prerequisites():
-        student = StudentAffairs()
+    def test_course_prerequisites(student_affairs):
         test_courses = StudentAffairs.read_json(JsonSettings(JsonType.COURSE, None))
         for course in test_courses:
             print(course.courseName + " " + course.courseCode.code + " " + (course.semester if int(course.semester) <= 8 else "Elective"))
             if course.prerequisites is not None:
                 print("##Preq##" + course.prerequisites.courseName)
+        return test_courses
 
     @staticmethod
-    def test_random_student_creation():
-        student_affairs = StudentAffairs()
+    def test_random_student_creation(student_affairs):
         random_students = student_affairs.create_random_student_list(100, 2018)
         for student in random_students:
             print(student.firstName + " " + student.lastName + " " + student.studentID.fullID + " " + "Completed Credits: " + str(student.completedCredits))
             StudentAffairs.write_json(JsonSettings(JsonType.STUDENT, student.studentID.fullID), student)
+        return random_students
 
 
 class JsonType(Enum):
-    STUDENT = 1
+    STUDENT = 1,
     COURSE = 2
 
 
@@ -52,8 +54,10 @@ class StudentAffairs:
         self.firstNameList = file1.readlines()
         file1 = open('lastname.txt', 'r', encoding='UTF-8')
         self.lastNameList = file1.readlines()
-        self.courses = StudentAffairs.read_json(JsonSettings(JsonType.COURSE, None))
-        print(self.courses[0].schedule[0].day)
+        self.courses = StudentAffairs.read_json(JsonSettings(JsonType.COURSE, None), self)
+
+    def get_courses(self):
+        return self.courses
 
     @staticmethod
     def read_lecture_hours():
@@ -158,9 +162,12 @@ class StudentAffairs:
                         ])
         return obj_dict
 
-    @staticmethod
-    def get_obj(json_type, data_dict):
+    def get_obj(self, json_type, data_dict):
         if json_type == JsonType.STUDENT:
+            for course in data_dict["Transcript"]:
+                for available_course in self.courses:
+                    if available_course.courseCode.code == course[0]:
+                        course[0] = available_course
             obj = Student(data_dict["Name"],
                           data_dict["Surname"],
                           data_dict["StudentID"],
@@ -222,12 +229,26 @@ class StudentAffairs:
             json.dump(temp_dict, output_file)
 
     @staticmethod
-    def read_json(json_settings):
+    def read_json(json_settings, sa):
 
         with open(json_settings.file_string) as input_file:
             data = json.load(input_file)
 
-        return StudentAffairs.get_obj(json_settings.json_type, data)
+        return sa.get_obj(json_settings.json_type, data)
+
+    @staticmethod
+    def read_all_students_json(sa):
+
+        students = []
+
+        onlyfiles = [f for f in listdir("students") if isfile(join("students", f))]
+
+        for filename in onlyfiles:
+            with open("students/" + filename) as input_file:
+                data = json.load(input_file)
+            students.append(sa.get_obj(JsonType.STUDENT, data))
+
+        return students
 
     def calculateTotalCredit(self, transcriptTemplate, semesterCounter):
         totalCredit = 0
@@ -411,4 +432,14 @@ class StudentAffairs:
 
 # StudentAffairs.save_json(x["Name"], x["Surname"])
 
-SystemTests.test_random_student_creation()
+student_affairs = StudentAffairs()
+
+SystemTests.test_random_student_creation(student_affairs)
+
+obj = StudentAffairs.read_json(JsonSettings(JsonType.STUDENT, "150118014"), student_affairs)
+
+objs = StudentAffairs.read_all_students_json(student_affairs)
+
+print(objs[0].studentID.fullID + " " + objs[0].firstName)
+
+print(student_affairs.courses)
