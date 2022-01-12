@@ -14,7 +14,7 @@ class Student:
             self.courseList = []
 
         else:
-            #firstName, lastName, studentID, transcript, advisor, semester, completedCredits
+            # firstName, lastName, studentID, transcript, advisor, semester, completedCredits
             self.firstName = args[0]
             self.lastName = args[1]
             studentID = StudentID(args[2])
@@ -36,5 +36,5 @@ class Student:
     """
     select course function(self):
         get courses according to their semester with student's semester.
-        
+
     """
