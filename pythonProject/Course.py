@@ -26,12 +26,12 @@ class Schedule:
         
         self.day = day
         self.hour = hour
-        self.hoursCode = self.parseHours(hoursDict)
+        #self.hoursCode = self.parseHours(hoursDict)
         
         
     def parseHours(self, hoursDict):
         alist = []
-        for i in self.hour:
+        for i in range(self.hour):
             if i in hoursDict.keys():
                 alist.append(hoursDict.get(i))
         return alist
