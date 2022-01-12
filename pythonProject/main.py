@@ -11,11 +11,12 @@ class SystemTests:
 
     @staticmethod
     def test_course_prerequisites():
+        student = StudentAffairs()
         test_courses = StudentAffairs.read_json(JsonSettings(JsonType.COURSE, None))
         for course in test_courses:
             print(course.courseName + " " + course.courseCode + " " + (course.semester if int(course.semester) <= 8 else "Elective"))
-            for course_preq in course.prerequisites:
-                print("##Preq##" + course_preq.courseName)
+            if course.prerequisites is not None:
+                print("##Preq##" + course.prerequisites.courseName)
 
     @staticmethod
     def test_random_student_creation():
@@ -49,6 +50,7 @@ class StudentAffairs:
         file1 = open('lastname.txt', 'r', encoding='UTF-8')
         self.lastNameList = file1.readlines()
         self.courses = StudentAffairs.read_json(JsonSettings(JsonType.COURSE, None))
+        self.write_lecture_hours()
 
     def write_lecture_hours(self):
 
@@ -61,7 +63,7 @@ class StudentAffairs:
 
         courseHourJsonObj = []
         for course in self.courses:
-            courseHourJsonObj.append([course.courseCode, random.randint(1, 9)])
+            courseHourJsonObj.append([course.courseCode, [random.randint(1, 5), random.randint(1, 8)]])
 
         temp_dict = {
             "Lecture Hours": []
@@ -79,9 +81,20 @@ class StudentAffairs:
             student_id = StudentID(year - int(0), i + 1)
             first_name = random.choice(self.firstNameList).strip('\n')
             second_name = random.choice(self.lastNameList).strip('\n')
-            student = Student(first_name, second_name,
-                              student_id,
-                              self.randomTranscript(self.courses, [student_id, first_name, second_name, 4]), "advisor", 4, "schedule", 0)
+            student = Student(first_name,
+                              second_name,
+                              student_id.fullID,
+                              self.randomTranscript(
+                                  self.courses,
+                                  [student_id,
+                                   first_name,
+                                   second_name,
+                                   4]
+                              ),
+                              "advisor",
+                              4,
+                              "schedule",
+                              0)
             students.append(student)
         return students
 
@@ -112,16 +125,6 @@ class StudentAffairs:
                             obj.transcript.transcriptList[i][1][k][1],
                             obj.transcript.transcriptList[i][1][k][2],
                         ])
-        else:
-            obj_dict = {
-                "Name": obj.firstName,
-                "Surname": obj.lastName,
-                "StudentID": obj.studentID.fullID,
-                "Semester": obj.semester,
-                "AdvisorID": 150118000,
-                "Completed Credits": obj.completedCredits,
-                "Transcript": []
-            }
         return obj_dict
 
     @staticmethod
@@ -362,4 +365,4 @@ class StudentAffairs:
 
 # StudentAffairs.save_json(x["Name"], x["Surname"])
 
-SystemTests.test_random_student_creation()
+SystemTests.test_course_prerequisites()
