@@ -5,22 +5,35 @@ class RegisterSystem:
         self.offeredCourses = offeredCourses
 
     def getAvailableCourses(self, student):
-        #öğrenci semestera dahil kurslar
-        #öğrenci transkripti
-        allTakenCourses =[]
 
-        for i in range(len(student.transcript.transcriptList)):
-            for j in range(len(student.transcript.transcriptList[i][1])):
-                allTakenCourses.append(student.transcript.transcriptList[i][1][j][0])
+        #get all taken courses by the student whether it is passed or failed.
+        allTakenCourses = []
+        allTakenCoursesCodes = []
+        for i in student.transcript.transcriptList:
+            for j in i[1]:
+                allTakenCourses.append(j[0])
+                allTakenCoursesCodes.append(j[0].courseCode.code)
 
+        #passed Courses and their code versions for easier use.
         passedCourses = []
+        passedCoursesCodes = []
+
+        #failed Courses and their code versions for easier use.
         failedCourses = []
+        failedCoursesCodes = []
+
+        #reason for reverse operation: if a student takes x course in 1st semester and fails,
+        #takes the same x course in 2nd semester and passes, transcript will record it as
+        #1st sem: FF, 2nd sem: Pass. Therefore we read the transcript reversed so we find out
+        #if student passed the course at last.
         for i in reversed(student.transcript.transcriptList):
             for j in i[1]:
-                if 'F' in j[1] and j[0] not in passedCourses:
+                if 'F' in j[1] and j[0].courseCode.code not in passedCoursesCodes:
                     failedCourses.append(j[0])
+                    failedCoursesCodes.append(j[0].courseCode.code)
                 else:
                     passedCourses.append(j[0])
+                    passedCoursesCodes.append(j[0].courseCode.code)
 
         semesterCourses = []
 
@@ -52,7 +65,7 @@ class RegisterSystem:
         if int(student.semester) == 2:
             while true:
                 course = random.choice(courseNTEandUE)
-                if course not in allTakenCourses:
+                if course.courseCode.code not in allTakenCoursesCodes:
                     semesterCourses.append(course)
                     break
 
@@ -60,7 +73,7 @@ class RegisterSystem:
             while true:
                 courseNTE = random.choice(courseNTEandUE)
                 courseFT = random.choice(courseFTE)
-                if courseNTE not in allTakenCourses and courseFT not in allTakenCourses:
+                if courseNTE.courseCode.code not in allTakenCoursesCodes and courseFT.courseCode.code not in allTakenCoursesCodes:
                     semesterCourses.append(courseNTE)
                     semesterCourses.append(courseFT)
                     break
@@ -68,10 +81,11 @@ class RegisterSystem:
                 course1 = random.choice(courseTE)
                 course2 = random.choice(courseTE)
                 course3 = random.choice(courseTE)
-                if course1 != course2 and course2 != course3\
-                        and course1 not in allTakenCourses\
-                        and course2 not in allTakenCourses\
-                        and course3 not in allTakenCourses:
+                if course1.courseCode.code != course2.courseCode.code\
+                        and course2.courseCode.code != course3.courseCode.code\
+                        and course1 not in allTakenCoursesCodes\
+                        and course2 not in allTakenCoursesCodes\
+                        and course3 not in allTakenCoursesCodes:
                     semesterCourses.append(course1)
                     semesterCourses.append(course2)
                     semesterCourses.append(course3)
@@ -80,8 +94,8 @@ class RegisterSystem:
         if int(student.semester) == 7:
             while true:
                 course = random.choice(courseTE)
-                if course not in allTakenCourses:
-                    semesterCourses.append(random.choice(courseNTEandUE))
+                if course.courseCode.code not in allTakenCoursesCodes:
+                    semesterCourses.append(course)
                     break
 
 
@@ -102,17 +116,21 @@ class RegisterSystem:
 
         for i in semesterCourses:
             if i.prerequisites:
-                for j in i.prerequisites:
-                    for k in failedCourses:
-                        if j.courseCode == k.courseCode:
-                            semesterCourses.remove(i)
-                            semesterCourses.append(k)
-                            print("Student " + student.studentID.fullID + " couldn't pick " + i.courseCode +
-                                  " course because it requires " + k.courseCode + " course.")
+                for k in failedCourses:
+                    if i.prerequisites.courseCode.code == k.courseCode.code:
+                        semesterCourses.remove(i)
+                        semesterCourses.append(k)
+                        print("Student " + student.studentID.fullID + " couldn't pick " + i.courseCode.code +
+                              " course because it requires " + k.courseCode.code + " course.")
+
+        semesterCoursesCodes = []
+        for i in semesterCourses:
+            semesterCoursesCodes.append(i.courseCode.code)
 
         for i in failedCourses:
-            if i not in semesterCourses:
+            if i.courseCode.code not in semesterCoursesCodes:
                 semesterCourses.append(i)
+                semesterCoursesCodes.append(i.courseCode.code)
 
         return semesterCourses
     
