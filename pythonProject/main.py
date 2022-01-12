@@ -375,4 +375,4 @@ class StudentAffairs:
 
 # StudentAffairs.save_json(x["Name"], x["Surname"])
 
-SystemTests.test_course_prerequisites()
+SystemTests.test_random_student_creation()
