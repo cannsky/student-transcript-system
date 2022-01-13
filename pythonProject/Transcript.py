@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-#################### düzenlenmiş transcript
+
 class Transcript:
     letterGradeDict = {
         "AA": 4.00,
@@ -19,7 +19,7 @@ class Transcript:
     #       [semester, [taken course objects list], creditTaken , creditCompleted , scoreSemester , gpa , cgpa ],
     #                                              ....
     #                                              ....
-    #            ] Note = taken course objects list be like = [course obj , lettergrade , taken semester]
+    #            ] Note = taken course objectslist equals transcriptTemplate [ [ course obj , lettergrade , taken semester]]
 
     # transcriptTemplate = [ [course , letter grade , taken semester ],
     #                        [course , letter grade , taken semester ],                                        ,
@@ -32,17 +32,20 @@ class Transcript:
         self.currentSemester = transCriptJsonStudentInfo[3]
         self.transcriptList = self.calcSemestersDetails(transcriptTemplate, self.currentSemester)
 
-    # list = [ [semester, [taken course objects], creditTaken , creditCompleted , scoreSemester , gpa , cgpa ],
+    # tListTemplate = [ [semester, [taken course objects], creditTaken , creditCompleted , scoreSemester , gpa , cgpa ],]
     def calcSemestersDetails(self, transcriptTemplate, currentSemester):
         tempTranscriptList = []
         tListTemplate = []
         currSemesterCourses = []
         sem = 1
+
         while sem < currentSemester:
             tListTemplate.insert(0, sem)
+
             for i in transcriptTemplate:
-                if i[2] == str(sem):
+                if int(i[2]) == int(sem):
                     currSemesterCourses.append(i)
+
             tListTemplate.insert(1, currSemesterCourses)
             creditTaken = self.calcCreditTaken(currSemesterCourses)
             tListTemplate.insert(2, creditTaken)
@@ -109,7 +112,7 @@ class Transcript:
             print("Semester : ", i[0])
             print("*******************************")
             for j in i[1]:
-                print("Course :", j[0].courseCode, j[0].courseName,
+                print("Course :", j[0].courseCode, j[0].courseName, "\nCourse Type:", j[0].courseType,
                       "\nCourse Semester:", j[0].semester, "\nTaken Semester:", j[2],
                       "\nCredit:", j[0].credit[0], "\nLetter Grade:", j[1])
                 print("........")
@@ -119,5 +122,3 @@ class Transcript:
             print("Score Semester = ", i[4])
             print("GPA = ", i[5])
             print("CGPA = ", i[6])
-
-############################################### transcripti oluşturan random method
