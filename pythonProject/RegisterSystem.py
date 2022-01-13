@@ -167,4 +167,14 @@ class RegisterSystem:
         for i in failedCourses:
             print(i.courseName + " " + i.courseCode.code)
 
+        for i in semesterCourses:
+            if self.semesterCode:
+                if int(i.semester) % 2 != 0:
+                    semesterCourses.remove(i)
+                    semesterCoursesCodes.remove(i.courseCode.code)
+            else:
+                if int(i.semester) % 2 == 0:
+                    semesterCourses.remove(i)
+                    semesterCoursesCodes.remove(i.courseCode.code)
+
         return semesterCourses
