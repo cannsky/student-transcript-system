@@ -68,52 +68,6 @@ class RegisterSystem:
                         and "UE" not in i.courseCode.code:
                     notTakenCourses.append(i)
 
-        #calculation of all elective courses which are taken by the student.
-        takenNTEandUE = 0
-        takenFTE = 0
-        takenTE = 0
-        for i in allTakenCourses:
-            if int(i.semester) == 11:
-                takenNTEandUE += 1
-            elif int(i.semester) == 10:
-                takenFTE += 1
-            elif int(i.semester) == 9:
-                takenTE += 1
-
-        #calculation of the maximum count of elective courses that can be chosen according to student's semester.
-        #(independent from past year selections. here we assume that student never chose an elective course.)
-        countOfNTEandUE = 0
-        countOfFTE = 0
-        countOfTE = 0
-        if int(student.semester) < 7:
-            countOfNTEandUE = 1
-        elif int(student.semester) < 8:
-            countOfNTEandUE = 2
-            countOfTE = 1
-        elif int(student.semester) >= 8:
-            countOfNTEandUE = 3
-            countOfTE = 4
-            countOfFTE = 1
-
-        # seçmelileri öğrenciye gönder(stu.countOFXXX=selfCountXXX)
-        # öğrenciye seçim listesini gönder(if countTE >0 send TE to stu)
-
-        courseNTEandUE = []
-        courseFTE = []
-        courseTE = []
-        for i in self.offeredCourses:
-            if i.semester == "11":
-                courseNTEandUE.append(i)
-            elif i.semester == "10":
-                courseFTE.append(i)
-            elif i.semester == "9":
-                courseTE.append(i)
-
-        #NTE: 2-1, 8-1
-        #TE: 7-1, 8-3
-        #FTE: 8-1
-        #UE: 7-1.
-
         #chooosing the non-elective courses that can be taken in the student's current semester.
         for i in mandatoryCourses:
             if i.semester == str(student.semester):
@@ -173,9 +127,68 @@ class RegisterSystem:
             if i.courseCode.code not in filteredSemesterCoursesCodes:
                 print(i.courseCode.code + " can not be taken in " + self.currentSemester + " semester.")
 
-        return filteredSemesterCourses
+        #############################################################################################
+        #### ELECTIVE COURSES
+        # calculation of count of all elective courses which are taken by the student.
+        takenNTEandUE = 0
+        takenFTE = 0
+        takenTE = 0
+        for i in allTakenCourses:
+            if int(i.semester) == 11:
+                takenNTEandUE += 1
+            elif int(i.semester) == 10:
+                takenFTE += 1
+            elif int(i.semester) == 9:
+                takenTE += 1
+
+        # calculation of the maximum count of elective courses that can be chosen according to student's semester.
+        # (independent from past year selections. here we assume that student never chose an elective course.)
+        countOfNTEandUE = 0
+        countOfFTE = 0
+        countOfTE = 0
+        if int(student.semester) < 7:
+            countOfNTEandUE = 1
+        elif int(student.semester) < 8:
+            countOfNTEandUE = 2
+            countOfTE = 1
+        elif int(student.semester) >= 8:
+            countOfNTEandUE = 3
+            countOfTE = 4
+            countOfFTE = 1
+
+        # calculating how many courses to take from each elective list
+        countOfNTEandUEToTake = countOfNTEandUE - takenNTEandUE
+        countOfTEToTake = countOfTE - takenTE
+        countOfFTEToTake = countOfFTE - takenFTE
+
+        # list of offered elective courses
+        courseNTEandUE = []
+        courseFTE = []
+        courseTE = []
+        for i in self.offeredCourses:
+            if i.semester == "11" and i.courseCode.code not in allTakenCoursesCodes:
+                courseNTEandUE.append(i)
+            elif i.semester == "10" and i.courseCode.code not in allTakenCoursesCodes:
+                courseFTE.append(i)
+            elif i.semester == "9" and i.courseCode.code not in allTakenCoursesCodes:
+                courseTE.append(i)
+
+        # CourseCode: Semester-Count
+        # NTE: 2-1, 8-1
+        # TE: 7-1, 8-3
+        # FTE: 8-1
+        # UE: 7-1.
+        student.courseNTEandUE = courseNTEandUE
+        student.courseFTE = courseFTE
+        student.courseTE = courseTE
+        student.countOfNTEandUEToTake = countOfNTEandUEToTake
+        student.countOfTEToTake = countOfTEToTake
+        student.countOfFTEToTake = countOfFTEToTake
+        student.availableCourses = filteredSemesterCourses
+
+
     def show(self, nonElectiveCourseList, student):
-        # student.transcript.show()
+        #student.transcript.show()
         print("-----------\n" + student.firstName + " " + student.lastName + " " + str(student.semester) + ". SEMESTER\n"
             "Courses that can be taken this semester are:")
         for i in nonElectiveCourseList:

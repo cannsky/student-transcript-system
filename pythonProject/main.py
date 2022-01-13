@@ -114,7 +114,7 @@ class StudentAffairs:
     def create_random_student_list(self, count, year):
         students = []
         for i in range(count):
-            student_id = StudentID(year - int(0), i + 1)
+            student_id = StudentID(year, i + 1)
             first_name = random.choice(self.firstNameList).strip('\n')
             second_name = random.choice(self.lastNameList).strip('\n')
             student = Student(first_name,
@@ -128,7 +128,7 @@ class StudentAffairs:
                                    4]
                               ),
                               "advisor",
-                              random.choice([2,3,4]),
+                              4,
                               "schedule",
                               0)
             students.append(student)
@@ -389,12 +389,20 @@ class StudentAffairs:
 
 student_affairs = StudentAffairs()
 
-SystemTests.test_random_student_creation(student_affairs)
+studentList = SystemTests.test_random_student_creation(student_affairs)
 
-obj = StudentAffairs.read_json(JsonSettings(JsonType.STUDENT, "150118014"), student_affairs)
 
-objs = StudentAffairs.read_all_students_json(student_affairs)
+#obj = StudentAffairs.read_json(JsonSettings(JsonType.STUDENT, "150118014"), student_affairs)
 
-print(objs[0].studentID.fullID + " " + objs[0].firstName)
+#objs = StudentAffairs.read_all_students_json(student_affairs)
 
-print(student_affairs.courses)
+print(studentList[0].studentID.fullID + " " + studentList[0].firstName + " " + str(studentList[0].semester))
+
+regSys = RegisterSystem(StudentAffairs.read_json(JsonSettings(JsonType.COURSE, None), student_affairs), "spring")
+regSys.getAvailableCourses(studentList[0])
+#print(studentList[0].countOfTEToTake)
+#for i in studentList[0].courseTE:
+#    print(i.courseCode.code)
+regSys.show(courseList, studentList[0])
+
+#print(student_affairs.courses)
