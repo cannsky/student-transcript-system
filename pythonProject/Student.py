@@ -1,18 +1,25 @@
 from StudentID import StudentID
+import random
 
 class Student:
     def __init__(self, *args):
+        self.courseNTEandUE = []
+        self.courseFTE = []
+        self.courseTE = []
+        self.countOfNTEandUEToTake = 0
+        self.countOfTEToTake = 0
+        self.countOfFTEToTake = 0
+        self.availableCourses = []
+        self.courseList = []
 
         if len(args) == 5:
             self.firstName = args[0]
             self.lastName = args[1]
-
             self.studentID = args[2]
             self.transcript = args[3]
             self.advisor = args[4]
             self.semester = 1
             self.completedCredits = 0
-            self.courseList = []
 
         else:
             # firstName, lastName, studentID, transcript, advisor, semester, completedCredits
@@ -24,7 +31,7 @@ class Student:
             self.advisor = args[4]
             self.semester = args[5]
             self.completedCredits = args[6]
-            self.courseList = []
+
 
     def addToCourses(self, course):
         self.courseList.append(course)
@@ -34,8 +41,11 @@ class Student:
             if i.courseID == course.courseID:
                 self.courseList.remove(i)
 
-    """
-    select course function(self):
-        get courses according to their semester with student's semester.
-
-    """
+    def enrollToCourses(self):
+        if countOfNTEandUEToTake > 0:
+            random.choice(courseNTEandUE, countOfNTEandUEToTake)
+            # CourseCode: Semester-Count
+            # NTE: 2-1, 8-1
+            # TE: 7-1, 8-3
+            # FTE: 8-1
+            # UE: 7-1.

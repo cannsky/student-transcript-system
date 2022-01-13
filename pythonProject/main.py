@@ -8,6 +8,7 @@ from Course import Course, CourseCode, Semester, Schedule
 from Student import Student
 from StudentID import StudentID
 from Transcript import Transcript
+from RegisterSystem import RegisterSystem
 
 
 class SystemTests:
@@ -113,7 +114,7 @@ class StudentAffairs:
     def create_random_student_list(self, count, year):
         students = []
         for i in range(count):
-            student_id = StudentID(year - int(0), i + 1)
+            student_id = StudentID(year, i + 1)
             first_name = random.choice(self.firstNameList).strip('\n')
             second_name = random.choice(self.lastNameList).strip('\n')
             student = Student(first_name,
@@ -310,7 +311,7 @@ class StudentAffairs:
                                 tempList = []
                             else:
                                 for j in transcriptTemplate:
-                                    if (j[0].courseCode == i.prerequisites.courseCode and j[1] != "FF"):
+                                    if (j[0].courseCode.code == i.prerequisites.courseCode.code and j[1] != "FF"):
                                         tempList.insert(0, i)
                                         tempList.insert(1, random.choice(letterGradeList))
                                         tempList.insert(2, semesterCounter)
@@ -318,7 +319,7 @@ class StudentAffairs:
                                         tempList = []
 
                         else:
-                            if i.courseCode.split("x", 1)[0] == "NTE" or i.courseCode.split("x", 1)[0] == "UE":
+                            if i.courseCode.code.split("x", 1)[0] == "NTE" or i.courseCode.code.split("x", 1)[0] == "UE":
 
                                 randomCourse = random.choice(courseNTEandUE)
                                 courseNTEandUE.remove(randomCourse)
@@ -331,14 +332,14 @@ class StudentAffairs:
                                 else:
 
                                     for j in transcriptTemplate:
-                                        if (j[0].courseCode == randomCourse.prerequisites.courseCode and j[1] != "FF"):
+                                        if (j[0].courseCode.code == randomCourse.prerequisites.courseCode.code and j[1] != "FF"):
                                             tempList.insert(0, randomCourse)
                                             tempList.insert(1, random.choice(letterGradeList))
                                             tempList.insert(2, semesterCounter)
                                             transcriptTemplate.append(tempList)
                                             tempList = []
 
-                            elif i.courseCode.split("x", 1)[0] == "FTE":
+                            elif i.courseCode.code.split("x", 1)[0] == "FTE":
 
                                 randomCourse = random.choice(courseFTE)
                                 courseFTE.remove(randomCourse)
@@ -351,13 +352,13 @@ class StudentAffairs:
                                 else:
 
                                     for j in transcriptTemplate:
-                                        if (j[0].courseCode == randomCourse.prerequisites.courseCode and j[1] != "FF"):
+                                        if (j[0].courseCode.code == randomCourse.prerequisites.courseCode.code and j[1] != "FF"):
                                             tempList.insert(0, randomCourse)
                                             tempList.insert(1, random.choice(letterGradeList))
                                             tempList.insert(2, semesterCounter)
                                             transcriptTemplate.append(tempList)
                                             tempList = []
-                            elif i.courseCode.split("x", 1)[0] == "TE":
+                            elif i.courseCode.code.split("x", 1)[0] == "TE":
 
                                 randomCourse = random.choice(courseTE)
                                 courseTE.remove(randomCourse)
@@ -371,7 +372,7 @@ class StudentAffairs:
                                 else:
 
                                     for j in transcriptTemplate:
-                                        if (j[0].courseCode == randomCourse.prerequisites.courseCode and j[1] != "FF"):
+                                        if (j[0].courseCode.code == randomCourse.prerequisites.courseCode.code and j[1] != "FF"):
                                             tempList.insert(0, randomCourse)
                                             tempList.insert(1, random.choice(letterGradeList))
                                             tempList.insert(2, semesterCounter)
@@ -380,7 +381,7 @@ class StudentAffairs:
 
             semesterCounter += 1
 
-        assignCourse(transcriptTemplate, currentSemester, letterGradeList)
+        self.assignCourse(transcriptTemplate, currentSemester, letterGradeList)
         t = Transcript(transcriptTemplate, transCriptJsonStudentInfo)
         return t
 
@@ -388,12 +389,20 @@ class StudentAffairs:
 
 student_affairs = StudentAffairs()
 
-SystemTests.test_random_student_creation(student_affairs)
+studentList = SystemTests.test_random_student_creation(student_affairs)
 
-obj = StudentAffairs.read_json(JsonSettings(JsonType.STUDENT, "150118014"), student_affairs)
 
-objs = StudentAffairs.read_all_students_json(student_affairs)
+#obj = StudentAffairs.read_json(JsonSettings(JsonType.STUDENT, "150118014"), student_affairs)
 
-print(objs[0].studentID.fullID + " " + objs[0].firstName)
+#objs = StudentAffairs.read_all_students_json(student_affairs)
 
-print(student_affairs.courses)
+print(studentList[0].studentID.fullID + " " + studentList[0].firstName + " " + str(studentList[0].semester))
+
+regSys = RegisterSystem(StudentAffairs.read_json(JsonSettings(JsonType.COURSE, None), student_affairs), "spring")
+regSys.getAvailableCourses(studentList[0])
+#print(studentList[0].countOfTEToTake)
+#for i in studentList[0].courseTE:
+#    print(i.courseCode.code)
+regSys.show(courseList, studentList[0])
+
+#print(student_affairs.courses)
