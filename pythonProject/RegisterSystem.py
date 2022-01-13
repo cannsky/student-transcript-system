@@ -4,10 +4,10 @@ class RegisterSystem:
     def __init__(self, offeredCourses, currentSemesterOfSystem):
         self.offeredCourses = offeredCourses
         self.currentSemester = currentSemesterOfSystem
-        if currentSemester == "fall":
-            self.semesterCode = 0
-        else:
+        if self.currentSemester == "fall":
             self.semesterCode = 1
+        else:
+            self.semesterCode = 0
 
     def getGradedCourses(self, student):
         # passed Courses and their code versions for easier use.
@@ -24,7 +24,7 @@ class RegisterSystem:
         # if student passed the course at last.
         for i in reversed(student.transcript.transcriptList):
             for j in i[1]:
-                if 'F' in j[1] and j[0].courseCode.code not in passedCoursesCodes \
+                if "FF" in j[1] and j[0].courseCode.code not in passedCoursesCodes \
                         and j[0].courseCode.code not in failedCoursesCodes:
                     failedCourses.append(j[0])
                     failedCoursesCodes.append(j[0].courseCode.code)
@@ -38,6 +38,7 @@ class RegisterSystem:
 
         #get all taken courses by the student whether it is passed or failed.
         allTakenCourses = []
+        allTakenCoursesCodes = []
         for i in student.transcript.transcriptList:
             for j in i[1]:
                 if j[0].courseCode.code not in allTakenCoursesCodes:
@@ -59,7 +60,6 @@ class RegisterSystem:
         #non-elective courses which are not taken past year(s) are offered to take in this year.
         #ex: ISG101 course is not taken before, so student can take it this year.
         notTakenCourses = []
-        notTakenCoursesCodes = []
         for i in mandatoryCourses:
             if int(i.semester) < int(student.semester) and i.courseCode.code not in allTakenCoursesCodes:
                 if "NTE" not in i.courseCode.code\
@@ -67,7 +67,6 @@ class RegisterSystem:
                         and "TE" not in i.courseCode.code\
                         and "UE" not in i.courseCode.code:
                     notTakenCourses.append(i)
-                    notTakenCourses.append(i.courseCode.code)
 
         #calculation of all elective courses which are taken by the student.
         takenNTEandUE = 0
@@ -156,25 +155,28 @@ class RegisterSystem:
                 semesterCourses.append(i)
                 semesterCoursesCodes.append(i.courseCode.code)
 
-        print()
-        student.transcript.show()
-        print()
-        print("-----------" + student.firstName + " " + student.lastName + " " + str(student.semester) + "-----------")
-        for i in semesterCourses:
-            print(i.courseName + " " + i.courseCode.code)
 
-        print("Failed:")
-        for i in failedCourses:
-            print(i.courseName + " " + i.courseCode.code)
-
+        #detect current semester that system is operating on and remove courses that aren't belong to this semester.
+        filteredSemesterCourses = []
+        filteredSemesterCoursesCodes = []
         for i in semesterCourses:
-            if self.semesterCode:
+            if self.currentSemester == "fall":
                 if int(i.semester) % 2 != 0:
-                    semesterCourses.remove(i)
-                    semesterCoursesCodes.remove(i.courseCode.code)
+                    filteredSemesterCourses.append(i)
+                    filteredSemesterCoursesCodes.append(i.courseCode.code)
             else:
                 if int(i.semester) % 2 == 0:
-                    semesterCourses.remove(i)
-                    semesterCoursesCodes.remove(i.courseCode.code)
+                    filteredSemesterCourses.append(i)
+                    filteredSemesterCoursesCodes.append(i.courseCode.code)
 
-        return semesterCourses
+        for i in semesterCourses:
+            if i.courseCode.code not in filteredSemesterCoursesCodes:
+                print(i.courseCode.code + " can not be taken in " + self.currentSemester + " semester.")
+
+        return filteredSemesterCourses
+    def show(self, nonElectiveCourseList, student):
+        # student.transcript.show()
+        print("-----------\n" + student.firstName + " " + student.lastName + " " + str(student.semester) + ". SEMESTER\n"
+            "Courses that can be taken this semester are:")
+        for i in nonElectiveCourseList:
+            print(i.courseCode.code + " " + i.courseName + " " + i.semester + ". semester course")
