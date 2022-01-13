@@ -250,52 +250,21 @@ class StudentAffairs:
 
         return students
 
-    def calculateTotalCredit(self, transcriptTemplate, semesterCounter):
-        totalCredit = 0
-        for i in transcriptTemplate:
-            if i[2] == str(semesterCounter):
-                if i[1] != "FF":
-                    totalCredit += int(i[0].credit[0])
-        return totalCredit
-
-    def createFailedCourseList(self, transcriptTemplate, currentSemester):
-        failedCourseList = []
-        num = 1
-        while num < currentSemester:
-            for i in transcriptTemplate:
-                if str(num) == i[0].semester:
-                    if i[1] == "FF":
-                        failedCourseList.append(i)
-            num += 1
-        return failedCourseList
-
     def assignCourse(self, transcriptTemplate, currentSemester, letterGradeList):
-        retL = []
         failedCourseList = []
         for i in transcriptTemplate:
             if i[1] == "FF":
                 failedCourseList.append(i)
 
-        semInfo = []
-        n = 1
-        while n < currentSemester:
-            l = []
-            l.insert(0, n)
-            l.insert(1, self.calculateTotalCredit(transcriptTemplate, n))
-            semInfo.append(l)
-            n += 1
-        l = []
-        for t in semInfo:
-
-            if int(t[1]) < 30 and int(t[0]) > 1:
-                for j in failedCourseList:
-                    if int(j[2]) < int(t[0]):
-                        tmp = []
-                        tmp.insert(0, j[0])
-                        tmp.insert(1, random.choice(letterGradeList))
-                        tmp.insert(2, str(t[0]))
-                        transcriptTemplate.append(tmp)
-                        failedCourseList.remove(j)
+        for a in failedCourseList:
+            if int(a[0].semester) < 7:
+                takenSemester = int(a[2])
+                takenSemester += 2
+                tmp = []
+                tmp.insert(0, a[0])
+                tmp.insert(1, random.choice(letterGradeList))
+                tmp.insert(2, str(takenSemester))
+                transcriptTemplate.append(tmp)
 
     def randomTranscript(self, wholeCourseList, transCriptJsonStudentInfo):
         letterGradeList = ["AA", "BA", "BB", "BC", "CC", "DC", "DD", "FD", "FF"]
@@ -336,97 +305,82 @@ class StudentAffairs:
                             if i.prerequisites is None:
                                 tempList.insert(0, i)
                                 tempList.insert(1, random.choice(letterGradeList))
-                                tempList.insert(2, i.semester)
+                                tempList.insert(2, semesterCounter)
                                 transcriptTemplate.append(tempList)
                                 tempList = []
                             else:
                                 for j in transcriptTemplate:
-                                    if j[0].courseCode.code == i.prerequisites.courseCode.code and j[1] != "FF":
+                                    if (j[0].courseCode == i.prerequisites.courseCode and j[1] != "FF"):
                                         tempList.insert(0, i)
                                         tempList.insert(1, random.choice(letterGradeList))
-                                        tempList.insert(2, i.semester)
+                                        tempList.insert(2, semesterCounter)
                                         transcriptTemplate.append(tempList)
                                         tempList = []
 
                         else:
-                            if i.courseCode.code.split("x", 1)[0] == "NTE" or i.courseCode.code.split("x", 1)[0] == "UE":
-                                randomListNTEandUE = []
-                                for a in courseNTEandUE:
-                                    if (int(a.courseCode.code[-4]) == int(semesterCounter / 2 + 1)):
-                                        randomListNTEandUE.append(a)
-                                randomCourse = random.choice(randomListNTEandUE)
+                            if i.courseCode.split("x", 1)[0] == "NTE" or i.courseCode.split("x", 1)[0] == "UE":
+
+                                randomCourse = random.choice(courseNTEandUE)
+                                courseNTEandUE.remove(randomCourse)
                                 if randomCourse.prerequisites is None:
                                     tempList.insert(0, randomCourse)
                                     tempList.insert(1, random.choice(letterGradeList))
-                                    tempList.insert(2, randomCourse.semester)
+                                    tempList.insert(2, semesterCounter)
                                     transcriptTemplate.append(tempList)
-
                                     tempList = []
-                                    randomListNTEandUE = []
                                 else:
 
                                     for j in transcriptTemplate:
-                                        if (j[0].courseCode.code == randomCourse.prerequisites.courseCode.code and j[1] != "FF"):
+                                        if (j[0].courseCode == randomCourse.prerequisites.courseCode and j[1] != "FF"):
                                             tempList.insert(0, randomCourse)
                                             tempList.insert(1, random.choice(letterGradeList))
-                                            tempList.insert(2, randomCourse.semester)
+                                            tempList.insert(2, semesterCounter)
                                             transcriptTemplate.append(tempList)
                                             tempList = []
-                                            randomListNTEandUE = []
 
-                            elif i.courseCode.code.split("x", 1)[0] == "FTE":
-                                randomListFTE = []
-                                for a in courseFTE:
-                                    if (int(a.courseCode.code[-4]) == int(semesterCounter / 2 + 1)):
-                                        randomListFTE.append(a)
-                                randomCourse = random.choice(randomListFTE)
+                            elif i.courseCode.split("x", 1)[0] == "FTE":
 
+                                randomCourse = random.choice(courseFTE)
+                                courseFTE.remove(randomCourse)
                                 if randomCourse.prerequisites is None:
                                     tempList.insert(0, randomCourse)
                                     tempList.insert(1, random.choice(letterGradeList))
-                                    tempList.insert(2, randomCourse.semester)
+                                    tempList.insert(2, semesterCounter)
                                     transcriptTemplate.append(tempList)
                                     tempList = []
-                                    randomListFTE = []
-
                                 else:
 
                                     for j in transcriptTemplate:
-                                        if (j[0].courseCode.code == randomCourse.prerequisites.courseCode.code and j[1] != "FF"):
+                                        if (j[0].courseCode == randomCourse.prerequisites.courseCode and j[1] != "FF"):
                                             tempList.insert(0, randomCourse)
                                             tempList.insert(1, random.choice(letterGradeList))
-                                            tempList.insert(2, randomCourse.semester)
+                                            tempList.insert(2, semesterCounter)
                                             transcriptTemplate.append(tempList)
                                             tempList = []
-                                            randomListFTE = []
-                            elif i.courseCode.code.split("x", 1)[0] == "TE":
-                                randomListTE = []
-                                for a in courseTE:
-                                    if (int(a.courseCode.code[-4]) == int(semesterCounter / 2 + 1)):
-                                        randomListTE.append(a)
-                                randomCourse = random.choice(randomListTE)
+                            elif i.courseCode.split("x", 1)[0] == "TE":
+
+                                randomCourse = random.choice(courseTE)
+                                courseTE.remove(randomCourse)
 
                                 if randomCourse.prerequisites is None:
                                     tempList.insert(0, randomCourse)
                                     tempList.insert(1, random.choice(letterGradeList))
-                                    tempList.insert(2, randomCourse.semester)
+                                    tempList.insert(2, semesterCounter)
                                     transcriptTemplate.append(tempList)
                                     tempList = []
-                                    randomListTE = []
                                 else:
 
                                     for j in transcriptTemplate:
-                                        if (j[0].courseCode.code == randomCourse.prerequisites.courseCode.code and j[1] != "FF"):
+                                        if (j[0].courseCode == randomCourse.prerequisites.courseCode and j[1] != "FF"):
                                             tempList.insert(0, randomCourse)
                                             tempList.insert(1, random.choice(letterGradeList))
-                                            tempList.insert(2, randomCourse.semester)
+                                            tempList.insert(2, semesterCounter)
                                             transcriptTemplate.append(tempList)
                                             tempList = []
-                                            randomListTE = []
 
             semesterCounter += 1
 
-        self.assignCourse(transcriptTemplate, currentSemester, letterGradeList)
+        assignCourse(transcriptTemplate, currentSemester, letterGradeList)
         t = Transcript(transcriptTemplate, transCriptJsonStudentInfo)
         return t
 
