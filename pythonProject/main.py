@@ -29,8 +29,7 @@ class SystemTests:
 
     @staticmethod
     def test_random_student_creation(student_affairs):
-        print("Hello")
-        random_students = student_affairs.create_random_student_list(100, 2018)
+        random_students = student_affairs.create_random_student_list(100, 2022)
         for student in random_students:
             #print(student.firstName + " " + student.lastName + " " + student.studentID.fullID + " " + "Completed Credits: " + str(student.completedCredits))
             StudentAffairs.write_json(JsonSettings(JsonType.STUDENT, student.studentID.fullID), student)
@@ -120,7 +119,7 @@ class StudentAffairs:
     def create_random_student_list(self, count, year):
         students = []
         for i in range(400):
-            student_id = StudentID(year, i + 1)
+            student_id = StudentID(year - int(i/100), i + 1)
             first_name = random.choice(self.firstNameList).strip('\n')
             second_name = random.choice(self.lastNameList).strip('\n')
             student = Student(first_name,
@@ -131,9 +130,9 @@ class StudentAffairs:
                                   [student_id,
                                    first_name,
                                    second_name,
-                                   int(i/400)+1]
+                                   int(i/50)+1]
                               ),
-                              int(i/400)+1)
+                              int(i/50)+1)
             students.append(student)
         return students
 
@@ -156,6 +155,7 @@ class StudentAffairs:
                 "Completed Credits": obj.completedCredits,
                 "Transcript": []
             }
+            '''
             for i in range(len(obj.transcript.transcriptList)):
                 for j in range(len(obj.transcript.transcriptList[i])):
                     for k in range(len(obj.transcript.transcriptList[i][1])):
@@ -163,7 +163,16 @@ class StudentAffairs:
                             obj.transcript.transcriptList[i][1][k][0].courseCode.code,
                             obj.transcript.transcriptList[i][1][k][1],
                             obj.transcript.transcriptList[i][1][k][2],
+                        ])'''
+
+            for semester in obj.transcript.transcriptList:
+                for semesterCourses in semester[1]:
+                        obj_dict['Transcript'].append([
+                            semesterCourses[0].courseCode.code,
+                            semesterCourses[1],
+                            semesterCourses[2]
                         ])
+
         return obj_dict
 
     def get_obj(self, json_type, data_dict):
@@ -480,9 +489,10 @@ for j in temp_2:
     new_list_2.append([j,count])
     
     
-print(studentList[0].courseList[0].schedule.days)
-            
-    
+#print(studentList[0].courseList[0].schedule.days)
+
+print(studentList[225].firstName)
+studentList[225].transcript.show()
          
                 
 
