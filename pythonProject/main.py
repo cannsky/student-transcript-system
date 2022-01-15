@@ -216,6 +216,11 @@ class StudentAffairs:
                         for i in range(1, len(lecture_hours["Lecture Hours"][a])):
                             schedules.append(Schedule(lecture_hours["Lecture Hours"][a][i][0], lecture_hours["Lecture Hours"][a][i][1]))
                         a += 1
+                else:
+                    if(data["Lecture Type"] != "Mandatory"):
+                        for i in range(1, len(lecture_hours["Lecture Hours"][a])):
+                            schedules.append(Schedule(lecture_hours["Lecture Hours"][a][i][0], lecture_hours["Lecture Hours"][a][i][1]))
+                        a += 1
                 if data["Prerequsite"] is not None:
                     for i in range(len(obj)):
                         for j in range(len(data["Prerequsite"])):
