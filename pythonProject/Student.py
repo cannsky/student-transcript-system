@@ -10,27 +10,31 @@ class Student:
         self.countOfTEToTake = 0
         self.countOfFTEToTake = 0
         self.availableCourses = []
+        self.schedule = []
+        self.currentCredits = 0;
         self.courseList = []
+        self.wishList = [];
 
-        if len(args) == 5:
+
+       
+
+        if len(args) == 4:
             self.firstName = args[0]
             self.lastName = args[1]
             self.studentID = args[2]
             self.transcript = args[3]
-            self.advisor = args[4]
             self.semester = 1
-            self.completedCredits = 0
+            self.completedCredits = self.transcript.calcCreditCompleted(self.transcript.transcriptList)
 
         else:
             # firstName, lastName, studentID, transcript, advisor, semester, completedCredits
             self.firstName = args[0]
             self.lastName = args[1]
-            studentID = StudentID(args[2])
-            self.studentID = studentID
+            self.studentID = args[2]
             self.transcript = args[3]
-            self.advisor = args[4]
-            self.semester = args[5]
-            self.completedCredits = args[6]
+            self.semester = args[4]
+            self.completedCredits = self.transcript.calcCreditCompleted(self.transcript.transcriptList)
+         
 
 
     def addToCourses(self, course):
@@ -42,8 +46,41 @@ class Student:
                 self.courseList.remove(i)
 
     def enrollToCourses(self):
-        if countOfNTEandUEToTake > 0:
-            random.choice(courseNTEandUE, countOfNTEandUEToTake)
+    
+        course_num_te = random.randint(1, 3)
+        course_num_fte = random.randint(1, 3)
+        course_num_nteandue = random.randint(1, 3)
+        
+        for i in self.availableCourses:
+            self.wishList.append(i);
+        random.shuffle(self.courseTE)
+        for i in range(course_num_te):
+            self.wishList.append(self.courseTE[i])
+        random.shuffle(self.courseFTE)
+        for i in range(course_num_fte):
+            self.wishList.append(self.courseFTE[i])
+        random.shuffle(self.courseNTEandUE)
+        for i in range(course_num_nteandue):
+            self.wishList.append(self.courseNTEandUE[i])
+            
+            
+    def showWishList(self):
+        for i in self.wishList:
+            print(i.courseCode.code)
+            
+            
+   
+    
+    def addCourseToSchedule(self, schedule):
+        
+        self.schedule.append(schedule)
+        
+            
+    
+            
+            
+            
+            
             # CourseCode: Semester-Count
             # NTE: 2-1, 8-1
             # TE: 7-1, 8-3

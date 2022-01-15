@@ -1,13 +1,15 @@
 import random
 class RegisterSystem:
 
-    def __init__(self, offeredCourses, currentSemesterOfSystem):
+    def __init__(self, offeredCourses, currentSemesterOfSystem,advisor):
         self.offeredCourses = offeredCourses
         self.currentSemester = currentSemesterOfSystem
+        self.advisor = advisor
         if self.currentSemester == "fall":
             self.semesterCode = 1
         else:
             self.semesterCode = 0
+        
 
     def getGradedCourses(self, student):
         # passed Courses and their code versions for easier use.

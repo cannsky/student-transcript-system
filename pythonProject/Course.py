@@ -76,6 +76,7 @@ class Course:
             self.schedule = schedule
             self.registeredStudents = registeredStudents
             self.theoreticalHours = theoreticalHours
+            self.currentStudentNum = 0;
             
             
             
