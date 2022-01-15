@@ -47,9 +47,11 @@ class Student:
 
     def enrollToCourses(self):
     
-        course_num_te = random.randint(1, 3)
-        course_num_fte = random.randint(1, 3)
-        course_num_nteandue = random.randint(1, 3)
+        
+        course_num_nteandue=self.countOfNTEandUEToTake 
+        course_num_te=self.countOfTEToTake 
+        course_num_fte=self.countOfFTEToTake 
+        print("Semester :", self.semester, course_num_nteandue,course_num_te,course_num_fte)
         
         for i in self.availableCourses:
             self.wishList.append(i);

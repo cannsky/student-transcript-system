@@ -116,28 +116,28 @@ class StudentAffairs:
 
     @staticmethod
     def write_lecture_problems(list1, list2, list3):
-
-        temp_dict = {
-            "Cant Registered": [],
-            "Due to Quota": [],
-            "Scheduling Problem": []
-        }
-
+            
+        temp_dict = [] 
         for item in list1:
-            temp_dict["Cant Registered"].append(item)
-
+            string = str(item[1]) +  " STUDENTS COULDN'T REGISTER FOR A " + item[0]+ " THIS SEMESTER"
+            temp_dict.append(string)
         for item in list2:
-            temp_dict["Due to Quota"].append(item)
-
+            string = str(item[1]) +  " STUDENTS COULDN'T REGISTER FOR A " + item[0]+ " THIS SEMESTER DUE TO QUOTA"           
+            temp_dict.append(string)
         for item in list3:
-            temp_dict["Scheduling Problem"].append(item)
-
-        with open("registerlog.json", "w+") as output_file:
-            json.dump(temp_dict, output_file)
+            string = str(item[1]) +  " STUDENTS COULDN'T REGISTER FOR A " + item[0]+ " THIS SEMESTER DUE TO SCHEDULE CONFLICT"                      
+            temp_dict.append(string)
+            
+            
+        json_object = json.dumps(temp_dict, indent = 1)
+        with open("registerlog.json", "w") as outfile:
+            outfile.write(json_object)
+            
+            
 
     def create_random_student_list(self, count, year):
         students = []
-        for i in range(400):
+        for i in range(560):
             student_id = StudentID(year - int(i/100), i + 1)
             first_name = random.choice(self.firstNameList).strip('\n')
             second_name = random.choice(self.lastNameList).strip('\n')
@@ -149,9 +149,9 @@ class StudentAffairs:
                                   [student_id,
                                    first_name,
                                    second_name,
-                                   int(i/50)+1]
+                                   int(i/70)+1]
                               ),
-                              int(i/50)+1)
+                              int(i/70)+1)
             students.append(student)
         return students
 
@@ -425,7 +425,7 @@ studentList = SystemTests.test_random_student_creation(student_affairs)
 
 #print(studentList[0].studentID.fullID + " " + studentList[0].firstName + " " + str(studentList[0].semester))
 advisor = Advisor("1501180000","Borahan","Tümer",studentList);
-regSys = RegisterSystem(StudentAffairs.read_json(JsonSettings(JsonType.COURSE, None), student_affairs), "fall",advisor)
+regSys = RegisterSystem(StudentAffairs.read_json(JsonSettings(JsonType.COURSE, None), student_affairs), "spring",advisor)
 regSys.getAvailableCourses(studentList[0])
 #print(studentList[0].countOfTEToTake)
 #for i in studentList[0].courseTE:
@@ -488,6 +488,7 @@ for j in temp_0:
             count +=1
     new_list_0.append([j,count])
     
+    
 for j in temp_1:
     count = 0
     for i in total_non_registered_1:
@@ -503,11 +504,14 @@ for j in temp_2:
     new_list_2.append([j,count])
     
     
+    
 #print(studentList[0].courseList[0].schedule.days)
 
-print(studentList[225].firstName)
-studentList[25].transcript.show()
+#for i in student_affairs.courses:
+   # print(i.courseCode.code, i.semester, i.quota, i.currentStudentNum)
+#studentList[25].transcript.show()
 
-StudentAffairs.write_lecture_problems(new_list_0, new_list_1, new_list_2)
+
+student_affairs.write_lecture_problems(new_list_0, new_list_1, new_list_2)
 
 

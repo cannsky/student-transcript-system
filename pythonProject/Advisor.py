@@ -50,17 +50,42 @@ class Advisor:
                 self.studentList.remove(i)
                 
                 
-    def compare_2_ScheduleList(schedule1, schedule2):
+    def compare_2_ScheduleList(self,schedule1, schedule2):
         
         conflict = 0
+        
         for i in schedule1:
+            #print("ANAN")
             for j in schedule2:
+                #print(i.day , i.hour, "----", j.day,j.hour)
                 if(i.day == j.day):
-                    for x in i.hours:
-                        for y in j.hours:
-                            if(x == y):
-                                conflict +=1
+                    if(i.hour == j.hour):
+                        conflict +=1
         return conflict
+    
+    def compareScheduleforAStudent(self,Student,course):
+        
+        
+        temp1 = course.schedule
+        #print(temp1)
+        conflict = 0
+        courses = []
+        for i in Student.courseList:
+            
+            conflict += self.compare_2_ScheduleList(temp1, i.schedule)
+            if(self.compare_2_ScheduleList(temp1, i.schedule) != 0):
+                courses.append(i.courseCode.code)
+        return conflict, courses
+    
+    def printCourses(self,courses):
+        string = ""
+        for i in courses:
+            string += i
+            string += " "
+            
+        return string
+            
+        
                             
                 
                 
@@ -70,6 +95,7 @@ class Advisor:
         
         #(defaultError:0 , quota:1, schdule : 2)        
         for i in student.wishList:
+
             #print(i.courseCode.code + " " + i.courseType + " " + i.semester)
             if(i.courseType == "Mandatory"):
                 
@@ -106,7 +132,8 @@ class Advisor:
                     if (student.transcript.creditCompleted >= 155):   #Credit check
                         if(student.countOfTEToTake > 0):  #Availability check
                             if(i.quota > i.currentStudentNum):  #Quota check
-                                if(True): #schedule conflict check
+                                conflict,courses = self.compareScheduleforAStudent(student,i) 
+                                if(conflict == 0): #schedule conflict check
                                     if(int(student.currentCredits) + int(i.credit[0]) <= 45):
                                         student.courseList.append(i)
                                         i.currentStudentNum += 1;
@@ -117,7 +144,7 @@ class Advisor:
                                         print("The Advisor did not approve " + i.courseCode.code + " becauese student can't take no more than 45 credits")
                                         log_error.append([student.studentID.fullID, i.courseCode.code, 0])
                                 else:
-                                    print("Advisor didn't approve" + i.courseCode.code + " becauese of ")
+                                    print("Advisor didn't approve" + i.courseCode.code + " becauese of " + str(conflict) + " hours collasion with " + self.printCourses(courses) +" in schedule" )
                                     log_error.append([student.studentID.fullID, i.courseCode.code, 2])
                             else:
                                 print("The Advisor didn't approve " + i.courseCode.code + " becauese quota is full")
@@ -136,7 +163,8 @@ class Advisor:
                     if (student.transcript.creditCompleted >= 210):   #Credit check
                         if(student.countOfFTEToTake > 0):  #Availability check
                             if(i.quota > i.currentStudentNum):  #Quota check
-                                if(True): #schedule conflict check
+                                conflict,courses = self.compareScheduleforAStudent(student,i) 
+                                if(conflict == 0): #schedule conflict check
                                     if(int(student.currentCredits) + int(i.credit[0]) <= 45):
                                         student.courseList.append(i)
                                         i.currentStudentNum += 1;
@@ -147,7 +175,8 @@ class Advisor:
                                         print("The Advisor did not approve " + i.courseCode.code + " becauese student can't take no more than 45 credits")
                                         log_error.append([student.studentID.fullID, i.courseCode.code, 0])
                                 else:
-                                    print("Advisor didn't approve" + i.courseCode.code + " becauese of ")
+                                    #Advisor didn't approve CSE3062 because of two hours collision with CSE2025 in schedule
+                                    print("Advisor didn't approve" + i.courseCode.code + " becauese of " + str(conflict) + " hours collasion with " + self.printCourses(courses) +" in schedule" )
                                     log_error.append([student.studentID.fullID, i.courseCode.code, 2])
                             else:
                                 print("The Advisor didn't approve " + i.courseCode.code + " becauese quota is full")
@@ -164,7 +193,8 @@ class Advisor:
                     #print(i.courseCode.code + " " +  i.courseType)
                     if(student.countOfNTEandUEToTake > 0):   #Credit check
                         if(i.quota > i.currentStudentNum):  #Availability check
-                            if(True):  #Quota check
+                            conflict,courses = self.compareScheduleforAStudent(student,i) 
+                            if(conflict == 0):  #Quota check
                                 if(int(student.currentCredits) + int(i.credit[0]) <= 45): #schedule conflict check
                                         student.courseList.append(i)
                                         i.currentStudentNum += 1;
@@ -175,7 +205,7 @@ class Advisor:
                                     print("The Advisor did not approve " + i.courseCode.code + " becauese student can't take no more than 45 credits")
                                     log_error.append([student.studentID.fullID, i.courseCode.code, 0])
                             else:
-                                print("Advisor didn't approve" + i.courseCode.code + " becauese of ")
+                                print("Advisor didn't approve" + i.courseCode.code + " becauese of " + str(conflict) + " hours collasion with " + self.printCourses(courses) +" in schedule" )
                                 log_error.append([student.studentID.fullID, i.courseCode.code, 2])
                         else:
                             print("The Advisor didn't approve " + i.courseCode.code + " becauese quota is full")
