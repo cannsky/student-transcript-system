@@ -155,16 +155,6 @@ class StudentAffairs:
                 "Completed Credits": obj.completedCredits,
                 "Transcript": []
             }
-            '''
-            for i in range(len(obj.transcript.transcriptList)):
-                for j in range(len(obj.transcript.transcriptList[i])):
-                    for k in range(len(obj.transcript.transcriptList[i][1])):
-                        obj_dict['Transcript'].append([
-                            obj.transcript.transcriptList[i][1][k][0].courseCode.code,
-                            obj.transcript.transcriptList[i][1][k][1],
-                            obj.transcript.transcriptList[i][1][k][2],
-                        ])'''
-
             for semester in obj.transcript.transcriptList:
                 for semesterCourses in semester[1]:
                         obj_dict['Transcript'].append([
@@ -204,7 +194,7 @@ class StudentAffairs:
                 schedules = []
                 if int(data["Semester"]) <= 8:
                     if(data["Lecture Type"] != "Elective"):
-                        for i in range(1, len(lecture_hours["Lecture Hours"][a]) - 1):
+                        for i in range(1, len(lecture_hours["Lecture Hours"][a])):
                             schedules.append(Schedule(lecture_hours["Lecture Hours"][a][i][0], lecture_hours["Lecture Hours"][a][i][1]))
                         a += 1
                 if data["Prerequsite"] is not None:
@@ -492,9 +482,9 @@ for j in temp_2:
 #print(studentList[0].courseList[0].schedule.days)
 
 print(studentList[225].firstName)
-studentList[225].transcript.show()
-         
-                
+studentList[25].transcript.show()
+
+
 
 
 
