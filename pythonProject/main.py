@@ -4,8 +4,6 @@ import re
 from os import listdir
 from os.path import isfile, join
 from enum import Enum
-from turtle import clear
-from xxlimited import new
 from Course import Course, CourseCode, Semester, Schedule
 from Student import Student
 from StudentID import StudentID
@@ -114,6 +112,27 @@ class StudentAffairs:
             temp_dict["Lecture Hours"].append(course);
 
         with open("lecturehours.json", "w+") as output_file:
+            json.dump(temp_dict, output_file)
+
+    @staticmethod
+    def write_lecture_problems(list1, list2, list3):
+
+        temp_dict = {
+            "Cant Registered": [],
+            "Due to Quota": [],
+            "Scheduling Problem": []
+        }
+
+        for item in list1:
+            temp_dict["Cant Registered"].append(item)
+
+        for item in list2:
+            temp_dict["Due to Quota"].append(item)
+
+        for item in list3:
+            temp_dict["Scheduling Problem"].append(item)
+
+        with open("registerlog.json", "w+") as output_file:
             json.dump(temp_dict, output_file)
 
     def create_random_student_list(self, count, year):
@@ -484,8 +503,6 @@ for j in temp_2:
 print(studentList[225].firstName)
 studentList[25].transcript.show()
 
-
-
-
+StudentAffairs.write_lecture_problems(new_list_0, new_list_1, new_list_2)
 
 
