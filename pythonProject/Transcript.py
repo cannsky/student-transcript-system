@@ -30,7 +30,8 @@ class Transcript:
         self.fName = transCriptJsonStudentInfo[1]
         self.lName = transCriptJsonStudentInfo[2]
         self.currentSemester = transCriptJsonStudentInfo[3]
-        self.transcriptList = self.calcSemestersDetails(transcriptTemplate, self.currentSemester)
+        self.transcriptList, self.creditCompleted = self.calcSemestersDetails(transcriptTemplate, self.currentSemester)
+    
 
     # tListTemplate = [ [semester, [taken course objects], creditTaken , creditCompleted , scoreSemester , gpa , cgpa ],]
     def calcSemestersDetails(self, transcriptTemplate, currentSemester):
@@ -38,6 +39,8 @@ class Transcript:
         tListTemplate = []
         currSemesterCourses = []
         sem = 1
+        overallCompeletedCredit = 0;
+
 
         while sem < currentSemester:
             tListTemplate.insert(0, sem)
@@ -50,6 +53,7 @@ class Transcript:
             creditTaken = self.calcCreditTaken(currSemesterCourses)
             tListTemplate.insert(2, creditTaken)
             tListTemplate.insert(3, self.calcCreditCompleted(currSemesterCourses))
+            overallCompeletedCredit += self.calcCreditCompleted(currSemesterCourses)
             score = self.calcScoreSemester(currSemesterCourses)
             tListTemplate.insert(4, score)
             gpa = (self.calcGPA(score, creditTaken))
@@ -58,12 +62,13 @@ class Transcript:
             tListTemplate.insert(5, gpa)
             tListTemplate.insert(6, None)
             tempTranscriptList.append(tListTemplate)
-
+            
             currSemesterCourses = []
             tListTemplate = []
             sem += 1
         self.calcCGPA(currentSemester, tempTranscriptList)
-        return tempTranscriptList
+        #print(overallCompeletedCredit)
+        return tempTranscriptList, overallCompeletedCredit
 
     def calcCreditTaken(self, tempList):
         credit = 0
@@ -74,8 +79,11 @@ class Transcript:
     def calcCreditCompleted(self, tempList):
         credit = 0
         for i in tempList:
-            if i[1] != "FF":
-                credit += int(i[0].credit[0])
+            crs = i
+            if (i[1] in  ["AA","BA","BB","BC","CC","DC","DD","FD"]):
+                temp = crs[0].credit[0]             
+                temp = int(temp)           
+                credit += temp
         return credit
 
     def calcScoreSemester(self, tempList):

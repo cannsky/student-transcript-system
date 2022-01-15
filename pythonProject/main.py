@@ -4,11 +4,15 @@ import re
 from os import listdir
 from os.path import isfile, join
 from enum import Enum
+from turtle import clear
+from xxlimited import new
 from Course import Course, CourseCode, Semester, Schedule
 from Student import Student
 from StudentID import StudentID
 from Transcript import Transcript
 from RegisterSystem import RegisterSystem
+from Advisor import Advisor
+
 
 
 class SystemTests:
@@ -17,16 +21,17 @@ class SystemTests:
     def test_course_prerequisites(student_affairs):
         test_courses = StudentAffairs.read_json(JsonSettings(JsonType.COURSE, None))
         for course in test_courses:
-            print(course.courseName + " " + course.courseCode.code + " " + (course.semester if int(course.semester) <= 8 else "Elective"))
+            #print(course.courseName + " " + course.courseCode.code + " " + (course.semester if int(course.semester) <= 8 else "Elective"))
             if course.prerequisites is not None:
-                print("##Preq##" + course.prerequisites.courseName)
+                #print("##Preq##" + course.prerequisites.courseName)
+                print()
         return test_courses
 
     @staticmethod
     def test_random_student_creation(student_affairs):
         random_students = student_affairs.create_random_student_list(100, 2018)
         for student in random_students:
-            print(student.firstName + " " + student.lastName + " " + student.studentID.fullID + " " + "Completed Credits: " + str(student.completedCredits))
+            #print(student.firstName + " " + student.lastName + " " + student.studentID.fullID + " " + "Completed Credits: " + str(student.completedCredits))
             StudentAffairs.write_json(JsonSettings(JsonType.STUDENT, student.studentID.fullID), student)
         return random_students
 
@@ -113,24 +118,21 @@ class StudentAffairs:
 
     def create_random_student_list(self, count, year):
         students = []
-        for i in range(count):
+        for i in range(400):
             student_id = StudentID(year, i + 1)
             first_name = random.choice(self.firstNameList).strip('\n')
             second_name = random.choice(self.lastNameList).strip('\n')
             student = Student(first_name,
                               second_name,
-                              student_id.fullID,
+                              student_id,
                               self.randomTranscript(
                                   self.courses,
                                   [student_id,
                                    first_name,
                                    second_name,
-                                   4]
+                                   int(i/400)+1]
                               ),
-                              "advisor",
-                              4,
-                              "schedule",
-                              0)
+                              int(i/400)+1)
             students.append(student)
         return students
 
@@ -220,6 +222,7 @@ class StudentAffairs:
                            schedules,
                            data["Theoretical Lecture Hours"]))
                 prerequisites = None
+                #print(schedules[0].day)
         return obj
 
     @staticmethod
@@ -396,13 +399,92 @@ studentList = SystemTests.test_random_student_creation(student_affairs)
 
 #objs = StudentAffairs.read_all_students_json(student_affairs)
 
-print(studentList[0].studentID.fullID + " " + studentList[0].firstName + " " + str(studentList[0].semester))
-
-regSys = RegisterSystem(StudentAffairs.read_json(JsonSettings(JsonType.COURSE, None), student_affairs), "spring")
+#print(studentList[0].studentID.fullID + " " + studentList[0].firstName + " " + str(studentList[0].semester))
+advisor = Advisor("1501180000","Borahan","Tümer",studentList);
+regSys = RegisterSystem(StudentAffairs.read_json(JsonSettings(JsonType.COURSE, None), student_affairs), "fall",advisor)
 regSys.getAvailableCourses(studentList[0])
 #print(studentList[0].countOfTEToTake)
 #for i in studentList[0].courseTE:
 #    print(i.courseCode.code)
-regSys.show(courseList, studentList[0])
+#print("*****")
+#regSys.show(studentList[0].availableCourses, studentList[0])
+#print(studentList[0].availableCourses[0].schedule)
+#print("*****")
+#studentList[0].enrollToCourses();
+#print("*****")
+#studentList[0].showWishList();
+#print("*****")
+#log_error = regSys.advisor.checkStudentWishList(regSys.advisor.studentList[0])
+#print("*****")
 
-#print(student_affairs.courses)
+all_logs = []
+for i in range(len(studentList)):
+    if(regSys.currentSemester=="fall" and studentList[i].semester % 2 == 1):
+        regSys.getAvailableCourses(studentList[i])
+        studentList[i].enrollToCourses();
+    elif(regSys.currentSemester=="spring" and studentList[i].semester % 2 == 0):
+        regSys.getAvailableCourses(studentList[i])
+        studentList[i].enrollToCourses();   
+    all_logs.append(regSys.advisor.checkStudentWishList(regSys.advisor.studentList[i]))
+    
+    
+print("********************************************************************************************************************************************************************************")
+
+total_non_registered_0 = []
+total_non_registered_1 = []
+course_list_0 = []
+course_list_1 = []
+total_non_registered_2 = []
+course_list_2 = []
+for i in all_logs:
+    for j in i:
+        if(j[2] == 0):
+            total_non_registered_0.append([j[0],j[1]])
+            course_list_0.append(j[1])
+        elif(j[2] == 1):
+            total_non_registered_1.append([j[0],j[1]])
+            course_list_1.append(j[1]) 
+        elif(j[2] == 2):
+            total_non_registered_2.append([j[0],j[1]])
+            course_list_2.append(j[1])          
+            
+
+temp_0 = set(course_list_0)
+temp_1 = set(course_list_1)
+temp_2 = set(course_list_2)
+
+new_list_0 = []   #Can't Registered
+new_list_1 = []   #Due to quota
+new_list_2 = []   #Due to scheduling
+
+for j in temp_0:
+    count = 0
+    for i in total_non_registered_0:
+        if j == i[1]:
+            count +=1
+    new_list_0.append([j,count])
+    
+for j in temp_1:
+    count = 0
+    for i in total_non_registered_1:
+        if j == i[1]:
+            count +=1
+    new_list_1.append([j,count])
+
+for j in temp_2:
+    count = 0
+    for i in total_non_registered_2:
+        if j == i[1]:
+            count +=1
+    new_list_2.append([j,count])
+    
+    
+print(studentList[0].courseList[0].schedule.days)
+            
+    
+         
+                
+
+
+
+
