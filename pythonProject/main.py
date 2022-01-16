@@ -177,7 +177,7 @@ class StudentAffairs:
                 "StudentID": obj.studentID.fullID,
                 "Semester": obj.semester,
                 "AdvisorID": 150118000,
-                "Completed Credits": obj.completedCredits,
+                "Completed Credits": obj.transcript.creditCompleted,
                 "Transcript": []
             }
             for semester in obj.transcript.transcriptList:

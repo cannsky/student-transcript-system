@@ -1,6 +1,5 @@
 from decimal import Decimal
 
-
 class Transcript:
     letterGradeDict = {
         "AA": 4.00,
@@ -13,7 +12,6 @@ class Transcript:
         "FD": 0.50,
         "FF": 0.00,
     }
-
     # transcriptList = [
     #       [semester, [taken course objects list], creditTaken , creditCompleted , scoreSemester  , gpa , cgpa ],
     #       [semester, [taken course objects list], creditTaken , creditCompleted , scoreSemester , gpa , cgpa ],
@@ -26,23 +24,38 @@ class Transcript:
     #                                        ....                    ]
 
     def __init__(self, transcriptTemplate, transCriptJsonStudentInfo):
+        self.transcriptTemplate=transcriptTemplate
         self.ID = transCriptJsonStudentInfo[0]
         self.fName = transCriptJsonStudentInfo[1]
         self.lName = transCriptJsonStudentInfo[2]
         self.currentSemester = transCriptJsonStudentInfo[3]
-        self.transcriptList, self.creditCompleted = self.calcSemestersDetails(transcriptTemplate, self.currentSemester)
-    
+        self.transcriptList = self.calcSemestersDetails(transcriptTemplate, self.currentSemester)
+        self.creditCompleted = self.calc()
+        #print("--------------",self.creditCompleted , self.currentSemester)
+
+    def calc(self):
+        num = 0
+        for i in self.transcriptList:
+            num += int(i[3])
+        return num
 
     # tListTemplate = [ [semester, [taken course objects], creditTaken , creditCompleted , scoreSemester , gpa , cgpa ],]
     def calcSemestersDetails(self, transcriptTemplate, currentSemester):
         tempTranscriptList = []
         tListTemplate = []
         currSemesterCourses = []
+        gpaList=[]
         sem = 1
-        overallCompeletedCredit = 0;
 
+        tourer = currentSemester
+        if len(transcriptTemplate) !=0 and currentSemester==1:
+            tourer=currentSemester+1
+        else:
+            for i in transcriptTemplate:
+                if int(i[2]) == currentSemester:
+                    tourer=currentSemester+1
 
-        while sem < currentSemester:
+        while sem < tourer:
             tListTemplate.insert(0, sem)
 
             for i in transcriptTemplate:
@@ -53,42 +66,63 @@ class Transcript:
             creditTaken = self.calcCreditTaken(currSemesterCourses)
             tListTemplate.insert(2, creditTaken)
             tListTemplate.insert(3, self.calcCreditCompleted(currSemesterCourses))
-            overallCompeletedCredit += self.calcCreditCompleted(currSemesterCourses)
             score = self.calcScoreSemester(currSemesterCourses)
             tListTemplate.insert(4, score)
             gpa = (self.calcGPA(score, creditTaken))
             gpaStr = str(gpa)[:4]
             gpa = Decimal(gpaStr)
+            gpaList.append(gpa)
             tListTemplate.insert(5, gpa)
-            tListTemplate.insert(6, None)
+            cgpa = self.calcCGPA(gpaList)
+            tListTemplate.insert(6, cgpa)
             tempTranscriptList.append(tListTemplate)
-            
+
             currSemesterCourses = []
             tListTemplate = []
             sem += 1
-        self.calcCGPA(currentSemester, tempTranscriptList)
-        #print(overallCompeletedCredit)
-        return tempTranscriptList, overallCompeletedCredit
+
+        return tempTranscriptList
+
+    def calcCGPA(self, gpaList):
+        if len(gpaList) == 0:
+            return 0
+        num = 0
+        cgpa = 0
+        for i in gpaList:
+            cgpa+=i
+            num+=1
+        cgpa = cgpa/num
+        return cgpa
 
     def calcCreditTaken(self, tempList):
+        if len(tempList) == 0:
+            return 0
         credit = 0
         for i in tempList:
             credit += int(i[0].credit[0])
         return credit
 
     def calcCreditCompleted(self, tempList):
+        if len(tempList) == 0:
+            return 0
         credit = 0
         for i in tempList:
+            if i[1] is None:
+                return 0
             crs = i
             if (i[1] in  ["AA","BA","BB","BC","CC","DC","DD","FD"]):
-                temp = crs[0].credit[0]             
-                temp = int(temp)           
+                temp = crs[0].credit[0]
+                temp = int(temp)
                 credit += temp
         return credit
 
     def calcScoreSemester(self, tempList):
+        if len(tempList) == 0:
+            return 0
         score = 0
         for i in tempList:
+            if i[1] is None:
+                return 0
             i1 = Decimal(self.letterGradeDict[i[1]])
             i2 = Decimal(i[0].credit[0])
             i3 = i1 * i2
@@ -96,23 +130,9 @@ class Transcript:
         return score
 
     def calcGPA(self, score, creditTaken):
+        if creditTaken == 0:
+            return 0
         return score / creditTaken
-
-    def calcCGPA(self, currentSemester, tempTranscriptList):
-        n = 1
-        cgpa = 0
-        while n < currentSemester:
-            for i in tempTranscriptList:
-                if n >= i[0]:
-                    gpa_s = str(i[5])
-                    gpa = Decimal(gpa_s)
-                    cgpa += gpa
-            cgpa = cgpa / n
-            cgpa_s = str(cgpa)[:4]
-            cgpa = Decimal(cgpa_s)
-            tempTranscriptList[n - 1].insert(6, cgpa)
-            cgpa = 0
-            n += 1
 
     def show(self):
         for i in self.transcriptList:
@@ -122,7 +142,11 @@ class Transcript:
             for j in i[1]:
                 print("Course :", j[0].courseCode, j[0].courseName, "\nCourse Type:", j[0].courseType,
                       "\nCourse Semester:", j[0].semester, "\nTaken Semester:", j[2],
-                      "\nCredit:", j[0].credit[0], "\nLetter Grade:", j[1])
+                      "\nCredit:", j[0].credit[0])
+                if(j[1] is None):
+                    print("Letter Grade:")
+                else:
+                    print("Letter Grade:", j[1])
                 print("........")
 
             print("Credit Taken = ", i[2])
