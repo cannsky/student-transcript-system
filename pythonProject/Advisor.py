@@ -55,9 +55,7 @@ class Advisor:
         conflict = 0
         
         for i in schedule1:
-            #print("ANAN")
             for j in schedule2:
-                #print(i.day , i.hour, "----", j.day,j.hour)
                 if(i.day == j.day):
                     if(i.hour == j.hour):
                         conflict +=1
@@ -85,21 +83,17 @@ class Advisor:
             
         return string
             
-        
-                            
-                
-                
+
+
     def checkStudentWishList(self,student):
         
         log_error = []
         
-        #(defaultError:0 , quota:1, schdule : 2)        
         for i in student.wishList:
 
-            #print(i.courseCode.code + " " + i.courseType + " " + i.semester)
             if(i.courseType == "Mandatory"):
                 
-                if(i.courseCode.code == "CSE4197"):  #Proje Dersiyse Grad Kontrolu
+                if(i.courseCode.code == "CSE4197"):
                     if(student.transcript.creditCompleted >= 165):
                        
                         if(int(student.currentCredits) + int(i.credit[0]) <= 45): #Credit check
@@ -190,7 +184,6 @@ class Advisor:
                         
                         
                 elif(i.semester == "11"): #NTE and UE check
-                    #print(i.courseCode.code + " " +  i.courseType)
                     if(student.countOfNTEandUEToTake > 0):   #Credit check
                         if(i.quota > i.currentStudentNum):  #Availability check
                             conflict,courses = self.compareScheduleforAStudent(student,i) 

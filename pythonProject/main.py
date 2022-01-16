@@ -19,17 +19,14 @@ class SystemTests:
     def test_course_prerequisites(student_affairs):
         test_courses = StudentAffairs.read_json(JsonSettings(JsonType.COURSE, None))
         for course in test_courses:
-            #print(course.courseName + " " + course.courseCode.code + " " + (course.semester if int(course.semester) <= 8 else "Elective"))
             if course.prerequisites is not None:
-                #print("##Preq##" + course.prerequisites.courseName)
                 print()
         return test_courses
 
     @staticmethod
     def test_random_student_creation(student_affairs):
-        random_students = student_affairs.create_random_student_list(100, 2022)
+        random_students = student_affairs.create_random_student_list(400, 2022)
         for student in random_students:
-            #print(student.firstName + " " + student.lastName + " " + student.studentID.fullID + " " + "Completed Credits: " + str(student.completedCredits))
             StudentAffairs.write_json(JsonSettings(JsonType.STUDENT, student.studentID.fullID), student)
         return random_students
 
@@ -137,8 +134,14 @@ class StudentAffairs:
 
     def create_random_student_list(self, count, year):
         students = []
-        for i in range(560):
-            student_id = StudentID(year - int(i/100), i + 1)
+        num = 1
+        for i in range(400):
+
+            if((i+1) % 50 == 0):
+                s = int(i / 50) + 1
+            else:
+                s = int(i/50) + 1
+            student_id = StudentID(year - int(i/100), num)
             first_name = random.choice(self.firstNameList).strip('\n')
             second_name = random.choice(self.lastNameList).strip('\n')
             student = Student(first_name,
@@ -149,10 +152,13 @@ class StudentAffairs:
                                   [student_id,
                                    first_name,
                                    second_name,
-                                   int(i/70)+1]
+                                   s]
                               ),
-                              int(i/70)+1)
+                              s)
             students.append(student)
+            num+=1
+            if num==101:
+                num=1
         return students
 
     @staticmethod
@@ -246,7 +252,6 @@ class StudentAffairs:
                            schedules,
                            data["Theoretical Lecture Hours"]))
                 prerequisites = None
-                #print(schedules[0].day)
         return obj
 
     @staticmethod
@@ -285,7 +290,7 @@ class StudentAffairs:
                 failedCourseList.append(i)
 
         for a in failedCourseList:
-            if int(a[0].semester) < 7:
+            if int(a[0].semester)+2 <= (currentSemester-1):
                 takenSemester = int(a[2])
                 takenSemester += 2
                 tmp = []
@@ -418,28 +423,14 @@ student_affairs = StudentAffairs()
 
 studentList = SystemTests.test_random_student_creation(student_affairs)
 
+sms =input("ENTER THE SEMESTER (FALL/SPRING)")
 
-#obj = StudentAffairs.read_json(JsonSettings(JsonType.STUDENT, "150118014"), student_affairs)
 
-#objs = StudentAffairs.read_all_students_json(student_affairs)
-
-#print(studentList[0].studentID.fullID + " " + studentList[0].firstName + " " + str(studentList[0].semester))
 advisor = Advisor("1501180000","Borahan","Tümer",studentList);
-regSys = RegisterSystem(StudentAffairs.read_json(JsonSettings(JsonType.COURSE, None), student_affairs), "spring",advisor)
+regSys = RegisterSystem(StudentAffairs.read_json(JsonSettings(JsonType.COURSE, None), student_affairs), sms,advisor)
 regSys.getAvailableCourses(studentList[0])
-#print(studentList[0].countOfTEToTake)
-#for i in studentList[0].courseTE:
-#    print(i.courseCode.code)
-#print("*****")
-#regSys.show(studentList[0].availableCourses, studentList[0])
-#print(studentList[0].availableCourses[0].schedule)
-#print("*****")
-#studentList[0].enrollToCourses();
-#print("*****")
-#studentList[0].showWishList();
-#print("*****")
-#log_error = regSys.advisor.checkStudentWishList(regSys.advisor.studentList[0])
-#print("*****")
+
+
 
 all_logs = []
 for i in range(len(studentList)):
@@ -450,8 +441,8 @@ for i in range(len(studentList)):
         regSys.getAvailableCourses(studentList[i])
         studentList[i].enrollToCourses();   
     all_logs.append(regSys.advisor.checkStudentWishList(regSys.advisor.studentList[i]))
-    
-    
+
+
 print("********************************************************************************************************************************************************************************")
 
 total_non_registered_0 = []
@@ -503,13 +494,10 @@ for j in temp_2:
             count +=1
     new_list_2.append([j,count])
     
-    
-    
-#print(studentList[0].courseList[0].schedule.days)
 
-#for i in student_affairs.courses:
-   # print(i.courseCode.code, i.semester, i.quota, i.currentStudentNum)
-#studentList[25].transcript.show()
+for i in studentList:
+    i.updateTranscript()
+    StudentAffairs.write_json(JsonSettings(JsonType.STUDENT, i.studentID.fullID), i)
 
 
 student_affairs.write_lecture_problems(new_list_0, new_list_1, new_list_2)

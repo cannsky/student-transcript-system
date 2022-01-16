@@ -1,4 +1,5 @@
 from StudentID import StudentID
+from Transcript import Transcript
 import random
 
 class Student:
@@ -76,15 +77,24 @@ class Student:
     def addCourseToSchedule(self, schedule):
         
         self.schedule.append(schedule)
-        
-            
-    
-            
-            
-            
-            
-            # CourseCode: Semester-Count
-            # NTE: 2-1, 8-1
-            # TE: 7-1, 8-3
-            # FTE: 8-1
-            # UE: 7-1.
+
+
+
+
+
+
+    def updateTranscript(self):
+        tempList = []
+        for i in self.courseList:
+            tempList.append([i,None,self.semester])
+
+        if(self.semester == 1):
+            self.transcript.transcriptList=self.transcript.calcSemestersDetails(tempList,self.semester)
+        else:
+            if(len(self.transcript.transcriptTemplate) != 0 and self.semester >1):
+                listTemp = []
+                for i in self.transcript.transcriptTemplate:
+                    listTemp.append(i)
+                for j in tempList:
+                    listTemp.append(j)
+                self.transcript.transcriptList=self.transcript.calcSemestersDetails(listTemp,self.semester)

@@ -26,8 +26,7 @@ class Schedule:
         
         self.day = day
         self.hour = hour
-        #self.hoursCode = self.parseHours(hoursDict)
-        
+
         
     def parseHours(self, hoursDict):
         alist = []
@@ -89,8 +88,7 @@ if __name__ == "__main__":
     print(sampleCode.code) 
     print(sampleSchedule.hoursCode)
     print(sampleCourse.courseName)
-    
-    print("**************")
+
     
     dbCode = CourseCode("CSE", 3055,0)
     dbSchedule = Schedule([1,2], ["10:30-11:20","14:00-14:50","15:00-15:50"])
